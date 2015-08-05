@@ -25,7 +25,8 @@ if __name__=="__main__":
         time.sleep(1)
 
         with open('log.txt', mode='a') as logfile:
-
+            if urlparse(currentpage).scheme == 'javascript':
+                currentpage=to_visit.pop()
             try:
                 r=requests.request(method='GET', url=currentpage).content
             except TimeoutError as e:
@@ -34,12 +35,14 @@ if __name__=="__main__":
             except requests.exceptions.InvalidSchema as e:
                 print(e)
                 continue
-            except Exception:
+            except Exception as e:
+                print(e)
                 continue
 
             visited.add(currentpage)
 
             for link in BeautifulSoup(r).find_all('a'):
+
                 if link.get('href') is not None:
                     LUNK = link.get('href').strip()
                 else:
@@ -49,7 +52,7 @@ if __name__=="__main__":
                 sortingHat = mimetypes.guess_type(LUNK)[0]
 
                 if 'livemeeting.com' in urlparse(LUNK).netloc:
-                    logfile.write(str(link) + ',' + currentpage + '\n')
+                    logfile.write(str(link.string) + ',' + LUNK + ',' + currentpage + '\n')
                     print(LUNK + '\t\t\t' + currentpage)
 
                 elif urlparse(LUNK).netloc=='':
@@ -89,5 +92,3 @@ if __name__=="__main__":
         currentpage=to_visit.pop() #remove and return an arbitrary element in to_visit
         print('new currentpage: ' + currentpage) #for mailto links, the mimetype is unknown
         #print(mimetypes.guess_type(currentpage))
-        if urlparse(currentpage).scheme == 'javascript':
-            currentpage=to_visit.pop()
