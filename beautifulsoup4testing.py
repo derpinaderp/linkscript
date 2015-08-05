@@ -20,12 +20,12 @@ if __name__=="__main__":
 
     to_visit.add(currentpage)  # which should be the homepage at this point
 
-    with open('log.txt', mode='w') as logfile:
-        #logwriter=csv.writer(logfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    while len(to_visit) > 0:
+        # sleep for a second before requesting the page
+        time.sleep(1)
 
-        while len(to_visit) > 0:
-            # sleep for a second before requesting the page
-            time.sleep(1)
+        with open('log.txt', mode='a') as logfile:
+
             try:
                 r=requests.request(method='GET', url=currentpage).content
             except TimeoutError as e:
@@ -34,14 +34,11 @@ if __name__=="__main__":
             except requests.exceptions.InvalidSchema as e:
                 print(e)
                 continue
-
-            #logfile.write(currentpage+'\n')
+            except Exception:
+                continue
 
             visited.add(currentpage)
-            #print('visited set: ' + str(visited))
-            #print('to_visit set: ' + str(to_visit))
 
-            #with open('links.txt', 'w', newline='') as links:
             for link in BeautifulSoup(r).find_all('a'):
                 if link.get('href') is not None:
                     LUNK = link.get('href').strip()
@@ -51,15 +48,8 @@ if __name__=="__main__":
 
                 sortingHat = mimetypes.guess_type(LUNK)[0]
 
-                #print('inside the for loop to find all the links \n' \
-                #     'working with: ' + LUNK \
-                #     + '\nmimetype: ' + str(sortingHat))
-
-                #if urlparse(LUNK).netloc == 'www.livemeeting.com':
                 if 'livemeeting.com' in urlparse(LUNK).netloc:
-                    #logwriter.writerow([LUNK, currentpage])
-                    logfile.write(LUNK + '\t\t\t' + currentpage + '\n')
-                    logfile.writelines(LUNK + '\t\t\t' + currentpage)
+                    logfile.write(str(link) + ',' + currentpage + '\n')
                     print(LUNK + '\t\t\t' + currentpage)
 
                 elif urlparse(LUNK).netloc=='':
@@ -90,16 +80,14 @@ if __name__=="__main__":
                     #print('different hosts, not adding to to_visit')
                     pass
 
-                #links.writelines(link.get('href') + '\n')
+        #check which items are in both visited and to_visit. remove those items from to_visit
+        for lonk in to_visit.intersection(visited):
+           #print('cleaning up')
+            to_visit.remove(lonk)
 
-            #check which items are in both visited and to_visit. remove those items from to_visit
-            for lonk in to_visit.intersection(visited):
-               #print('cleaning up')
-                to_visit.remove(lonk)
-
-            #set currentpage to one of the links in the to_visit
-            currentpage=to_visit.pop() #remove and return an arbitrary element in to_visit
-            print('new currentpage: ' + currentpage) #for mailto links, the mimetype is unknown
-            #print(mimetypes.guess_type(currentpage))
-            if urlparse(currentpage).scheme == 'javascript':
-                currentpage=to_visit.pop()
+        #set currentpage to one of the links in the to_visit
+        currentpage=to_visit.pop() #remove and return an arbitrary element in to_visit
+        print('new currentpage: ' + currentpage) #for mailto links, the mimetype is unknown
+        #print(mimetypes.guess_type(currentpage))
+        if urlparse(currentpage).scheme == 'javascript':
+            currentpage=to_visit.pop()
