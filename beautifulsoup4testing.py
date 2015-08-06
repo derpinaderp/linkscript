@@ -11,8 +11,8 @@ def same_host(url1, url2):
     return host1.netloc==host2.netloc
 
 if __name__=="__main__":
-    currentpage='http://www.bestworkplaces.org/'
-    homepage = 'http://www.bestworkplaces.org/'
+    currentpage='http://www.cutr.usf.edu/'
+    homepage = 'http://www.cutr.usf.edu/'
 
     # define the currently empty sets for visited and to_visit
     to_visit=set()
@@ -25,8 +25,12 @@ if __name__=="__main__":
         time.sleep(1)
 
         with open('log.txt', mode='a') as logfile:
-            if urlparse(currentpage).scheme == 'javascript' or urlparse(currentpage).scheme == 'file':
+            if urlparse(currentpage).scheme == 'javascript' or urlparse(currentpage).scheme == 'file' or urlparse(currentpage).scheme == 'mhtml' or urlparse(currentpage).scheme == 'tel':
                 currentpage=to_visit.pop()
+            if urlparse(currentpage).fragment == 'top':
+                visited.add(currentpage)
+                currentpage=to_visit.pop()
+                continue
             try:
                 r=requests.request(method='GET', url=currentpage).content
             except TimeoutError as e:
@@ -53,7 +57,7 @@ if __name__=="__main__":
 
                 if 'livemeeting.com' in urlparse(LUNK).netloc:
                     logfile.write(str(link.string) + ',' + LUNK + ',' + currentpage + '\n')
-                    print(LUNK + '\t\t\t' + currentpage)
+                    print('found a livemeeting lunk!')
 
                 elif urlparse(LUNK).netloc=='':
                     #print('inside the IF statement that should attach the homepage hostname to links without hostnames')
