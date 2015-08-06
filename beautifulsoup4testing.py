@@ -25,7 +25,7 @@ if __name__=="__main__":
         time.sleep(1)
 
         with open('log.txt', mode='a') as logfile:
-            if urlparse(currentpage).scheme == 'javascript':
+            if urlparse(currentpage).scheme == 'javascript' or urlparse(currentpage).scheme == 'file':
                 currentpage=to_visit.pop()
             try:
                 r=requests.request(method='GET', url=currentpage).content
