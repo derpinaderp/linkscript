@@ -11,8 +11,8 @@ def same_host(url1, url2):
     return host1.netloc==host2.netloc
 
 if __name__=="__main__":
-    currentpage='http://www.nctr.usf.edu//'
-    homepage = 'http://www.nctr.usf.edu/'
+    currentpage='http://floridartap.org/'
+    homepage = 'http://floridartap.org/'
 
     # define the currently empty sets for visited and to_visit
     to_visit=set()
@@ -66,7 +66,7 @@ if __name__=="__main__":
 
                 if 'livemeeting.com' in urlparse(LUNK).netloc:
                     logfile.write(str(link.string) + ',' + LUNK + ',' + currentpage + '\n')
-                    print('found a livemeeting lunk!')
+                    logging.info('found a livemeeting lunk! {}\t\t\t{}'.format(LUNK, currentpage))
 
                 elif urlparse(LUNK).netloc=='':
                     #print('inside the IF statement that should attach the homepage hostname to links without hostnames')
